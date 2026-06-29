@@ -38,3 +38,4 @@ The Pi is equipped with a POE + NVME hat.
 
 
 <img width="777" height="369" alt="image" src="https://github.com/user-attachments/assets/0d44ed49-da64-45dd-93b1-8c42e716434e" />
+<img width="620" height="75" alt="image" src="https://github.com/user-attachments/assets/f96a41ba-1de6-413e-bc9e-ba84dabfe8ad" />
