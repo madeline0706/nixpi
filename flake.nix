@@ -132,6 +132,7 @@
             jdk25
             restic
             awscli2
+            jq
           ];
           programs.bash.interactiveShellInit = ''
             _restic() {
@@ -143,6 +144,29 @@
                   --password-file "${config.sops.secrets.restic_password.path}" \
                   "$@"
               )
+            }
+            latest() {
+              _restic snapshots --latest 1
+            }
+            mcupdate() {
+              local type=''${1:-release}
+              echo "Fetching Minecraft version manifest..."
+              local manifest
+              manifest=$(curl -sf https://launchermeta.mojang.com/mc/game/version_manifest.json) \
+                || { echo "Failed to fetch manifest"; return 1; }
+              local version
+              version=$(echo "$manifest" | jq -r ".latest.$type")
+              local version_url
+              version_url=$(echo "$manifest" | jq -r --arg v "$version" '.versions[] | select(.id == $v) | .url')
+              local jar_url
+              jar_url=$(curl -sf "$version_url" | jq -r '.downloads.server.url') \
+                || { echo "Failed to fetch version info"; return 1; }
+              echo "Stopping server and downloading Minecraft $type $version..."
+              systemctl stop minecraft
+              curl -f -o /var/lib/minecraft/server.jar "$jar_url" \
+                || { echo "Download failed, restarting with old jar"; systemctl start minecraft; return 1; }
+              systemctl start minecraft
+              echo "Done: now running Minecraft $type $version"
             }
             backup() {
               systemctl start restic-backups-minecraft.service
