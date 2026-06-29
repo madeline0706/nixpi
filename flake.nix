@@ -99,6 +99,7 @@
           };
 
           environment.systemPackages = with pkgs; [
+	    btop
             git
             fastfetch
             jdk25
