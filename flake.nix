@@ -113,7 +113,7 @@
             repository = "s3:https://3d8695564f8c30d83f912a07c253bf21.r2.cloudflarestorage.com/madelineslovelyworld";
             passwordFile = config.sops.secrets.restic_password.path;
             environmentFile = config.sops.templates."restic-env".path;
-            paths = [ "/var/lib/minecraft" ];
+            paths = [ "/var/lib/minecraft" "/var/lib/sops-nix/key.txt" ];
             timerConfig = {
               OnCalendar = "daily";
               Persistent = true;
