@@ -42,6 +42,17 @@
           sops.age.keyFile = "/var/lib/sops-nix/key.txt";
           sops.secrets.FRP_TOKEN = {};
 
+          sops.secrets.restic_password = {};
+          sops.secrets.r2_access_key_id = {};
+          sops.secrets.r2_secret_access_key = {};
+
+          sops.templates."restic-env" = {
+            content = ''
+              AWS_ACCESS_KEY_ID=${config.sops.placeholder.r2_access_key_id}
+              AWS_SECRET_ACCESS_KEY=${config.sops.placeholder.r2_secret_access_key}
+            '';
+          };
+
           sops.templates."frpc.toml" = {
             content = ''
               serverAddr = "192.227.231.178"
@@ -96,6 +107,22 @@
               Restart = "on-failure";
               RestartSec = "5s";
             };
+          };
+
+          services.restic.backups.minecraft = {
+            repository = "s3:https://3d8695564f8c30d83f912a07c253bf21.r2.cloudflarestorage.com/madelineslovelyworld";
+            passwordFile = config.sops.secrets.restic_password.path;
+            environmentFile = config.sops.templates."restic-env".path;
+            paths = [ "/var/lib/minecraft" ];
+            timerConfig = {
+              OnCalendar = "daily";
+              Persistent = true;
+            };
+            pruneOpts = [
+              "--keep-daily 7"
+              "--keep-last 1"
+            ];
+            initialize = true;
           };
 
           environment.systemPackages = with pkgs; [
