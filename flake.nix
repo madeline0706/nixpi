@@ -60,6 +60,32 @@
             '';
           };
 
+          users.users.minecraft = {
+            isSystemUser = true;
+            group = "minecraft";
+            home = "/var/lib/minecraft";
+          };
+          users.groups.minecraft = {};
+
+          systemd.tmpfiles.rules = [
+            "d /var/lib/minecraft 0750 minecraft minecraft -"
+          ];
+
+          systemd.services.minecraft = {
+            description = "Minecraft server";
+            wantedBy = [ "multi-user.target" ];
+            after = [ "network.target" ];
+            serviceConfig = {
+              ExecStart = "/var/lib/minecraft/start.sh";
+              WorkingDirectory = "/var/lib/minecraft";
+              User = "minecraft";
+              Restart = "on-failure";
+              RestartSec = "5s";
+            };
+          };
+
+          networking.firewall.allowedTCPPorts = [ 25565 ];
+
           systemd.services.frpc = {
             description = "frp client";
             wantedBy = [ "multi-user.target" ];
