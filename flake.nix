@@ -85,6 +85,7 @@
           };
 
           networking.firewall.allowedTCPPorts = [ 25565 ];
+          networking.firewall.trustedInterfaces = [ "tailscale0" ];
 
           systemd.services.frpc = {
             description = "frp client";
