@@ -78,6 +78,27 @@
             restic
             awscli2
           ];
+          programs.bash.interactiveShellInit = ''
+            nixpush() {
+              cd ~/nix && \
+              git add . && \
+              git commit -m "''${1:-Update config}" && \
+              git push
+            }
+            nixsync() {
+              cd ~/nix && \
+              git pull && \
+              sudo nixos-rebuild switch --flake .#nixpi
+            }
+            nixup() {
+              cd ~/nix && \
+              git add . && \
+              git commit -m "''${1:-Update config}" && \
+              sudo nixos-rebuild switch --flake .#nixpi && \
+              git push
+            }
+          '';
+          nix.settings.experimental-features = [ "nix-command" "flakes" ];
           system.stateVersion = "25.05";
         })
       ];
