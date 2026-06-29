@@ -148,9 +148,8 @@
             latest() {
               _restic snapshots --latest 1
             }
-            mcupdate() {
+            _mc_resolve() {
               local type=''${1:-release}
-              echo "Fetching Minecraft version manifest..."
               local manifest
               manifest=$(curl -sf https://launchermeta.mojang.com/mc/game/version_manifest.json) \
                 || { echo "Failed to fetch manifest"; return 1; }
@@ -161,12 +160,50 @@
               local jar_url
               jar_url=$(curl -sf "$version_url" | jq -r '.downloads.server.url') \
                 || { echo "Failed to fetch version info"; return 1; }
+              printf '%s\n%s\n' "$version" "$jar_url"
+            }
+            _mc_do() {
+              local type=$1
+              local info version jar_url
+              info=$(_mc_resolve "$type") || return 1
+              version=$(echo "$info" | head -1)
+              jar_url=$(echo "$info" | tail -1)
+              echo "Backing up before update..."
+              systemctl start restic-backups-minecraft.service \
+                || { echo "Backup failed, aborting update"; return 1; }
               echo "Stopping server and downloading Minecraft $type $version..."
               systemctl stop minecraft
               curl -f -o /var/lib/minecraft/server.jar "$jar_url" \
                 || { echo "Download failed, restarting with old jar"; systemctl start minecraft; return 1; }
               systemctl start minecraft
               echo "Done: now running Minecraft $type $version"
+            }
+            mcup() {
+              case "$1" in
+                latest)
+                  case "$2" in
+                    stable)
+                      local info
+                      info=$(_mc_resolve release) || return 1
+                      echo "Latest stable: $(echo "$info" | head -1)"
+                      ;;
+                    snapshot)
+                      local info
+                      info=$(_mc_resolve snapshot) || return 1
+                      echo "Latest snapshot: $(echo "$info" | head -1)"
+                      ;;
+                    *) echo "Usage: mcup latest stable|snapshot";;
+                  esac
+                  ;;
+                stable)   _mc_do release;;
+                snapshot) _mc_do snapshot;;
+                *)
+                  echo "mcup latest stable    — show latest stable version"
+                  echo "mcup latest snapshot  — show latest snapshot version"
+                  echo "mcup stable           — backup and update to latest stable"
+                  echo "mcup snapshot         — backup and update to latest snapshot"
+                  ;;
+              esac
             }
             backup() {
               systemctl start restic-backups-minecraft.service
