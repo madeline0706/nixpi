@@ -1,0 +1,5 @@
+keys:
+  - &madeline age12waysvnf7ndycamqupszcc75wqjr3vtlrmhnew4mkulswtqrqyzq5rrep6
+creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    age: *madeline
