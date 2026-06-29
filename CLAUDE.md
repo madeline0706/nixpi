@@ -63,6 +63,18 @@ The SOPS age recipient is configured in `.sops.yaml` — any new secrets files m
 - The `hardware-configuration.nix` file is present but the `flake.nix` overrides `fileSystems` and `swapDevices` directly — it uses partition labels (`by-partlabel`) rather than UUIDs from the generated file
 - The frpc config is rendered at runtime by sops-nix into a secrets-owned path; the `systemd.services.frpc` unit references `config.sops.templates."frpc.toml".path` directly
 
+## Backups
+
+Daily restic backups of `/var/lib/minecraft` and `/var/lib/sops-nix/key.txt` run at 3AM America/Los_Angeles, uploaded to Cloudflare R2 (`madelineslovelyworld` bucket). Retention: 7 daily snapshots.
+
+Shell helpers available on the Pi:
+
+- `backup` — run a backup immediately and tail the logs
+- `snapshots` — list available snapshots with IDs and timestamps
+- `restore <snapshot-id>` — stop the Minecraft server, restore the snapshot to its original paths, restart the server
+
+To restore: run `snapshots` to find the ID, then `restore <id>`. The `--target /` flag tells restic to write files back to their original absolute paths.
+
 ## Shell helpers (on the Pi)
 
 Three bash functions are injected into root's interactive shell via `programs.bash.interactiveShellInit`:

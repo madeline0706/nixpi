@@ -115,7 +115,7 @@
             environmentFile = config.sops.templates."restic-env".path;
             paths = [ "/var/lib/minecraft" "/var/lib/sops-nix/key.txt" ];
             timerConfig = {
-              OnCalendar = "daily";
+              OnCalendar = "America/Los_Angeles *-*-* 03:00:00";
               Persistent = true;
             };
             pruneOpts = [
@@ -134,6 +134,29 @@
             awscli2
           ];
           programs.bash.interactiveShellInit = ''
+            _restic() {
+              (
+                set -a
+                source "${config.sops.templates."restic-env".path}"
+                exec restic \
+                  -r "s3:https://3d8695564f8c30d83f912a07c253bf21.r2.cloudflarestorage.com/madelineslovelyworld" \
+                  --password-file "${config.sops.secrets.restic_password.path}" \
+                  "$@"
+              )
+            }
+            backup() {
+              systemctl start restic-backups-minecraft.service
+              journalctl -u restic-backups-minecraft.service -n 50
+            }
+            snapshots() {
+              _restic snapshots
+            }
+            restore() {
+              if [ -z "$1" ]; then echo "Usage: restore <snapshot-id>"; return 1; fi
+              systemctl stop minecraft
+              _restic restore "$1" --target /
+              systemctl start minecraft
+            }
             nixpush() {
               cd ~/nix && \
               git add . && \
