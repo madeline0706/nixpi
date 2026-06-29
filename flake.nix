@@ -44,7 +44,7 @@
 
           sops.templates."frpc.toml" = {
             content = ''
-              serverAddr = "TODO_FRP_SERVER_IP"
+              serverAddr = "192.227.231.178"
               serverPort = 7000
 
               [auth]
