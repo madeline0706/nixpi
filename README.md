@@ -34,7 +34,7 @@ These commands ease the use of Restic. Run ``snapshots`` to get the list of ID's
 
 ## System specifications
 This is ran on my Raspberry Pi 5, 8GB. This little beast is by no means great at running a Minecraft world, but who cares?
-The Pi is equiped with a POE + NVME hat.
+The Pi is equipped with a POE + NVME hat.
 
 
 <img width="777" height="369" alt="image" src="https://github.com/user-attachments/assets/0d44ed49-da64-45dd-93b1-8c42e716434e" />
