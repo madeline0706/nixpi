@@ -32,6 +32,13 @@
           swapDevices = [{ device = "/dev/disk/by-partlabel/disk-nvme-swap"; }];
           boot.loader.raspberry-pi.bootloader = "kernel";
           networking.hostName = "nix-mc";
+          networking.useDHCP = false;
+          networking.interfaces.end0.ipv4.addresses = [{
+            address = "10.0.0.9";
+            prefixLength = 24;
+          }];
+          networking.defaultGateway = "10.0.0.1";
+          networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
           services.openssh.enable = true;
           users.users.root.openssh.authorizedKeys.keys = [
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOARmU1gT1eVnYO4yA9TRBbY6DRirqQXjWKnpa+5eMbv madeline@bulbasaur-nix"
