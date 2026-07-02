@@ -1,4 +1,4 @@
-# NixPi - My personal Minecraft world :3  
+# nix-mc - my personal Minecraft world :3  
 
 ``! Note: This flake will require some changes if anyone wants to use it.``
 
