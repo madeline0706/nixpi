@@ -1,5 +1,5 @@
 {
-  description = "raspberry pi 5 - nixpi";
+  description = "nix-mc";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
@@ -31,7 +31,7 @@
           };
           swapDevices = [{ device = "/dev/disk/by-partlabel/disk-nvme-swap"; }];
           boot.loader.raspberry-pi.bootloader = "kernel";
-          networking.hostName = "nixpi";
+          networking.hostName = "nix-mc";
           services.openssh.enable = true;
           users.users.root.openssh.authorizedKeys.keys = [
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOARmU1gT1eVnYO4yA9TRBbY6DRirqQXjWKnpa+5eMbv madeline@bulbasaur-nix"
